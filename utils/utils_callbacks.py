@@ -2,8 +2,11 @@ import logging
 import os
 import time
 from typing import List
+import sys
 
 import torch
+
+sys.path.append('/home/user3/ElasticFace/')
 
 from eval import verification
 from utils.utils_logging import AverageMeter

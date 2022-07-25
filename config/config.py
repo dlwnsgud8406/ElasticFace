@@ -1,13 +1,13 @@
 from easydict import EasyDict as edict
 
 config = edict()
-config.dataset = "emoreIresNet" # training dataset
+config.dataset = "MegaFace" # training dataset
 config.embedding_size = 512 # embedding size of model
 config.momentum = 0.9
 config.weight_decay = 5e-4
 config.batch_size = 128 # batch size per GPU
-config.lr = 0.1
-config.output = "output/R100_ElasticArcFace" # train model output folder
+config.lr = 1e-1
+config.output = "output/R100_ElasticArcFace/" # train model output folder
 config.global_step=0 # step to resume
 config.s=64.0
 config.m=0.50
@@ -59,6 +59,21 @@ elif config.dataset == "webface":
     config.num_epoch = 40   #  [22, 30, 35]
     config.warmup_epoch = -1
     config.val_targets = ["lfw", "cfp_fp", "cfp_ff", "agedb_30", "calfw", "cplfw"]
+    config.eval_step= 958 #33350
+    def lr_step_func(epoch):
+        return ((epoch + 1) / (4 + 1)) ** 2 if epoch < config.warmup_epoch else 0.1 ** len(
+            [m for m in [22, 30, 40] if m - 1 <= epoch])
+    config.lr_func = lr_step_func
+
+elif config.dataset == "MegaFace":
+    config.rec = "/home/user3/ElasticFace/datasets/faces_megafacetrain_112x112"
+    config.num_classes = 13233
+    config.num_image = 657078
+    config.num_epoch = 40   #  [22, 30, 35]
+    config.warmup_epoch = -1
+    config.val_targets = ["lfw"]
+    # config.val_targets = ["vlfw", "cfp_fp", "cfp_ff", "agedb_30"]
+    # config.val_targets = ["lfw", "cfp_fp", "cfp_ff", "agedb_30", "calfw", "cplfw"]
     config.eval_step= 958 #33350
     def lr_step_func(epoch):
         return ((epoch + 1) / (4 + 1)) ** 2 if epoch < config.warmup_epoch else 0.1 ** len(

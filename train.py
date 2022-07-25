@@ -19,6 +19,10 @@ from utils.utils_logging import AverageMeter, init_logging
 
 from backbones.iresnet import iresnet100, iresnet50
 
+# os.environ['MASTER_ADDR'] = '127.0.0.1'
+# os.environ['MASTER_PORT'] = '1236'
+# os.environ['RANK'] = '0'
+# os.environ['WORLD_SIZE'] = '4'
 
 torch.backends.cudnn.benchmark = True
 
