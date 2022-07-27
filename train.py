@@ -1,7 +1,10 @@
 import argparse
 import logging
 import os
+from threading import local
 import time
+
+from multiprocessing import set_start_method # 스폰시키자
 
 import torch
 import torch.distributed as dist
@@ -19,14 +22,15 @@ from utils.utils_logging import AverageMeter, init_logging
 
 from backbones.iresnet import iresnet100, iresnet50
 
-# os.environ['MASTER_ADDR'] = '127.0.0.1'
-# os.environ['MASTER_PORT'] = '1236'
-# os.environ['RANK'] = '0'
-# os.environ['WORLD_SIZE'] = '4'
 
 torch.backends.cudnn.benchmark = True
 
 def main(args):
+    set_start_method('spawn', force=True)
+    # os.environ["RANK"] = '0'
+    # os.environ["WORLD_SIZE"] = '0'
+    # os.environ["MASTER_ADDR"] = '127.0.0.1'
+    # os.environ["MASTER_PORT"] = '1203'
     dist.init_process_group(backend='nccl', init_method='env://')
     local_rank = args.local_rank
     torch.cuda.set_device(local_rank)

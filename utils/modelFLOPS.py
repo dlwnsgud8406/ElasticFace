@@ -1,6 +1,6 @@
 import logging
 
-from pytorch_model_summary import summary
+from torchsummary import summary
 
 import torch
 

@@ -1,7 +1,9 @@
 output/
 output_features/
 output_features_clean/
+outputs/
 cmc_roc_results/
 .idea
 .DS_Store
 datasets/
+test_data/

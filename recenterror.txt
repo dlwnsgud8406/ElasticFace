@@ -1,0 +1,59 @@
+Traceback (most recent call last):
+  File "train.py", line 195, in <module>
+Traceback (most recent call last):
+  File "train.py", line 195, in <module>
+Traceback (most recent call last):
+Traceback (most recent call last):
+  File "train.py", line 195, in <module>
+  File "train.py", line 195, in <module>
+    parser.add_argument('--local_rank', type=int, default=0, help='local_rank')
+  File "train.py", line 31, in main
+    parser.add_argument('--local_rank', type=int, default=0, help='local_rank')
+  File "train.py", line 31, in main
+    # os.environ["WORLD_SIZE"] = '0'
+  File "/home/user3/anaconda3/envs/lowmytorch/lib/python3.7/site-packages/torch/distributed/distributed_c10d.py", line 455, in init_process_group
+    parser.add_argument('--local_rank', type=int, default=0, help='local_rank')
+  File "train.py", line 31, in main
+    # os.environ["WORLD_SIZE"] = '0'
+  File "/home/user3/anaconda3/envs/lowmytorch/lib/python3.7/site-packages/torch/distributed/distributed_c10d.py", line 455, in init_process_group
+    parser.add_argument('--local_rank', type=int, default=0, help='local_rank')
+  File "train.py", line 31, in main
+    # os.environ["WORLD_SIZE"] = '0'
+  File "/home/user3/anaconda3/envs/lowmytorch/lib/python3.7/site-packages/torch/distributed/distributed_c10d.py", line 455, in init_process_group
+    # os.environ["WORLD_SIZE"] = '0'
+  File "/home/user3/anaconda3/envs/lowmytorch/lib/python3.7/site-packages/torch/distributed/distributed_c10d.py", line 455, in init_process_group
+    barrier()
+  File "/home/user3/anaconda3/envs/lowmytorch/lib/python3.7/site-packages/torch/distributed/distributed_c10d.py", line 1960, in barrier
+    barrier()
+  File "/home/user3/anaconda3/envs/lowmytorch/lib/python3.7/site-packages/torch/distributed/distributed_c10d.py", line 1960, in barrier
+    barrier()
+  File "/home/user3/anaconda3/envs/lowmytorch/lib/python3.7/site-packages/torch/distributed/distributed_c10d.py", line 1960, in barrier
+    barrier()
+  File "/home/user3/anaconda3/envs/lowmytorch/lib/python3.7/site-packages/torch/distributed/distributed_c10d.py", line 1960, in barrier
+    work = _default_pg.barrier()
+RuntimeError: NCCL error in: /opt/conda/conda-bld/pytorch_1607370141920/work/torch/lib/c10d/ProcessGroupNCCL.cpp:784, invalid usage, NCCL version 2.7.8
+    work = _default_pg.barrier()
+RuntimeError: NCCL error in: /opt/conda/conda-bld/pytorch_1607370141920/work/torch/lib/c10d/ProcessGroupNCCL.cpp:784, invalid usage, NCCL version 2.7.8
+    work = _default_pg.barrier()
+RuntimeError: NCCL error in: /opt/conda/conda-bld/pytorch_1607370141920/work/torch/lib/c10d/ProcessGroupNCCL.cpp:784, invalid usage, NCCL version 2.7.8
+    work = _default_pg.barrier()
+RuntimeError: NCCL error in: /opt/conda/conda-bld/pytorch_1607370141920/work/torch/lib/c10d/ProcessGroupNCCL.cpp:784, invalid usage, NCCL version 2.7.8
+Traceback (most recent call last):
+  File "/home/user3/anaconda3/envs/lowmytorch/lib/python3.7/runpy.py", line 193, in _run_module_as_main
+    "__main__", mod_spec)
+  File "/home/user3/anaconda3/envs/lowmytorch/lib/python3.7/runpy.py", line 85, in _run_code
+    exec(code, run_globals)
+  File "/home/user3/anaconda3/envs/lowmytorch/lib/python3.7/site-packages/torch/distributed/launch.py", line 260, in <module>
+    main()
+  File "/home/user3/anaconda3/envs/lowmytorch/lib/python3.7/site-packages/torch/distributed/launch.py", line 256, in main
+    cmd=cmd)
+subprocess.CalledProcessError: Command '['/home/user3/anaconda3/envs/lowmytorch/bin/python3', '-u', 'train.py', '--local_rank=3']' returned non-zero exit status 1.
+sh: 1: kill: Operation not permitted
+
+sh: 3: kill: Operation not permitted
+
+sh: 4: kill: Operation not permitted
+
+sh: 5: kill: Operation not permitted
+
+sh: 6: kill: Operation not permitted
