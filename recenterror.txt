@@ -57,3 +57,6 @@ sh: 4: kill: Operation not permitted
 sh: 5: kill: Operation not permitted
 
 sh: 6: kill: Operation not permitted
+
+
+https://jsc5565.tistory.com/3
