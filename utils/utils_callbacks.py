@@ -35,6 +35,9 @@ class CallBackVerification(object):
             logging.info(
                 '[%s][%d]Accuracy-Highest: %1.5f' % (self.ver_name_list[i], global_step, self.highest_acc_list[i]))
             results.append(acc2)
+            logging.info(
+                '[%s][%d]Accuracy: %1.5f' % (self.ver_name_list[i], global_step, acc1))
+            
 
     def init_dataset(self, val_targets, data_dir, image_size):
         for name in val_targets:
