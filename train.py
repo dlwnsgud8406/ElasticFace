@@ -1,10 +1,11 @@
+
+
+from multiprocessing import set_start_method # 스폰시키자
+
 import argparse
 import logging
 import os
-from threading import local
 import time
-
-from multiprocessing import set_start_method # 스폰시키자
 
 import torch
 import torch.distributed as dist
@@ -22,40 +23,33 @@ from utils.utils_logging import AverageMeter, init_logging
 
 from backbones.iresnet import iresnet100, iresnet50
 
+# torch.cuda.set_per_process_memory_fraction(0.25, 0)
 
 torch.backends.cudnn.benchmark = True
 set_start_method('spawn', force=True)
 def main(args):
-    
-    # dist.init_process_group(backend='nccl', init_method='tcp://127.0.0.1:1236', rank=0, world_size=4)
+    dist.init_process_group(backend='nccl', init_method='env://')
     local_rank = args.local_rank
     torch.cuda.set_device(local_rank)
-    # rank = dist.get_rank()
-    # world_size = dist.get_world_size()
-
+    rank = dist.get_rank()
+    world_size = dist.get_world_size()
 
     # if not os.path.exists(cfg.output) and rank == 0:
-        # os.makedirs(cfg.output)
+    #     os.makedirs(cfg.output)
     # else:
-        # time.sleep(2)
-
-    if not os.path.exists(cfg.output) :
-        os.makedirs(cfg.output)
-    else:
-        time.sleep(2)
-
+    #     time.sleep(2)
 
     log_root = logging.getLogger()
-    # init_logging(log_root, rank, cfg.output)
-    init_logging(log_root, cfg.output)
+    init_logging(log_root, rank, cfg.output)
 
     trainset = MXFaceDataset(root_dir=cfg.rec, local_rank=local_rank)
 
-    # train_sampler = torch.utils.data.distributed.DistributedSampler(trainset, shuffle=True)
-    # train_sampler = torch.utils.data(trainset, shuffle=True)     
+    train_sampler = torch.utils.data.distributed.DistributedSampler(
+        trainset, shuffle=True)
+
     train_loader = DataLoaderX(
         local_rank=local_rank, dataset=trainset, batch_size=cfg.batch_size,
-        sampler=trainset, num_workers=0, pin_memory=True, drop_last=True)
+        sampler=train_sampler, num_workers=0, pin_memory=True, drop_last=True)
 
     # load model
     if cfg.network == "iresnet100":
@@ -72,8 +66,8 @@ def main(args):
             backbone_pth = os.path.join(cfg.output, str(cfg.global_step) + "backbone.pth")
             backbone.load_state_dict(torch.load(backbone_pth, map_location=torch.device(local_rank)))
 
-            # if rank == 0:
-            logging.info("backbone resume loaded successfully!")
+            if rank == 0:
+                logging.info("backbone resume loaded successfully!")
         except (FileNotFoundError, KeyError, IndexError, RuntimeError):
             logging.info("load backbone resume init, failed!")
 
@@ -107,8 +101,8 @@ def main(args):
             header_pth = os.path.join(cfg.output, str(cfg.global_step) + "header.pth")
             header.load_state_dict(torch.load(header_pth, map_location=torch.device(local_rank)))
 
-            # if rank == 0:
-            logging.info("header resume loaded successfully!")
+            if rank == 0:
+                logging.info("header resume loaded successfully!")
         except (FileNotFoundError, KeyError, IndexError, RuntimeError):
             logging.info("header resume init, failed!")
     
@@ -118,11 +112,11 @@ def main(args):
 
     opt_backbone = torch.optim.SGD(
         params=[{'params': backbone.parameters()}],
-        lr=cfg.lr / 512 * cfg.batch_size * 4, # replace world_size to 4
+        lr=cfg.lr / 512 * cfg.batch_size * world_size,
         momentum=0.9, weight_decay=cfg.weight_decay)
     opt_header = torch.optim.SGD(
         params=[{'params': header.parameters()}],
-        lr=cfg.lr / 512 * cfg.batch_size * 4,
+        lr=cfg.lr / 512 * cfg.batch_size * world_size,
         momentum=0.9, weight_decay=cfg.weight_decay)
 
     scheduler_backbone = torch.optim.lr_scheduler.LambdaLR(
@@ -133,8 +127,8 @@ def main(args):
     criterion = CrossEntropyLoss()
 
     start_epoch = 0
-    total_step = int(len(trainset) / cfg.batch_size / 4 * cfg.num_epoch)
-    # if rank == 0: logging.info("Total Step is: %d" % total_step)
+    total_step = int(len(trainset) / cfg.batch_size / world_size * cfg.num_epoch)
+    if rank == 0: logging.info("Total Step is: %d" % total_step)
 
     if args.resume:
         rem_steps = (total_step - cfg.global_step)
@@ -153,13 +147,9 @@ def main(args):
         print("last learning rate: {}".format(scheduler_header.get_lr()))
         # ------------------------------------------------------------
 
-    # callback_verification = CallBackVerification(cfg.eval_step, rank, cfg.val_targets, cfg.rec)
-    # callback_logging = CallBackLogging(50, rank, total_step, cfg.batch_size, world_size, writer=None)
-    # callback_checkpoint = CallBackModelCheckpoint(rank, cfg.output)
-# 
-    callback_verification = CallBackVerification(cfg.eval_step, 0, cfg.val_targets, cfg.rec)
-    callback_logging = CallBackLogging(50, 0, total_step, cfg.batch_size, 4, writer=None)
-    callback_checkpoint = CallBackModelCheckpoint(0, cfg.output)
+    callback_verification = CallBackVerification(cfg.eval_step, rank, cfg.val_targets, cfg.rec)
+    callback_logging = CallBackLogging(50, rank, total_step, cfg.batch_size, world_size, writer=None)
+    callback_checkpoint = CallBackModelCheckpoint(rank, cfg.output)
 
     loss = AverageMeter()
     global_step = cfg.global_step
